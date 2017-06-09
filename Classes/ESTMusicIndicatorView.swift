@@ -31,6 +31,7 @@ import UIKit
  
  */
 
+@objc
 public enum ESTMusicIndicatorViewState: Int {
      /**
      Stopped state of an indicator view.

@@ -27,13 +27,14 @@ import UIKit
 
 class ESTMusicIndicatorContentView: UIView {
     
-    private let kBarCount = 3
-    private let kBarWidth:CGFloat = 3.0
+    private let kBarCount = 4
+    private let KBarPeakHeight:[CGFloat] = [7.0, 5.0, 8.0, 10.0]
+    private let kBarWidth:CGFloat = 1.0
     private let kBarIdleHeight:CGFloat = 3.0
-    private let kHorizontalBarSpacing:CGFloat = 2.0 // Measured on iPad 2 (non-Retina)
-    private let kRetinaHorizontalBarSpacing:CGFloat = 1.5 // Measured on iPhone 5s (Retina)
+    private let kHorizontalBarSpacing:CGFloat = 1.0 // Measured on iPad 2 (non-Retina)
+    private let kRetinaHorizontalBarSpacing:CGFloat = 1.0 // Measured on iPhone 5s (Retina)
     private let kBarMinPeakHeight:CGFloat = 6.0
-    private let kBarMaxPeakHeight:CGFloat = 12.0
+    private let kBarMaxPeakHeight:CGFloat = 10.0
     private let kMinBaseOscillationPeriod = CFTimeInterval(0.6)
     private let kMaxBaseOscillationPeriod = CFTimeInterval(0.8)
     private let kOscillationAnimationKey:String = "oscillation"
@@ -128,8 +129,13 @@ class ESTMusicIndicatorContentView: UIView {
     func startOscillation() {
         let basePeriod = kMinBaseOscillationPeriod + (drand48() * (kMaxBaseOscillationPeriod - kMinBaseOscillationPeriod))
         
-        for layer in barLayers {
-            startOscillatingBarLayer(layer, basePeriod: basePeriod)
+        
+        for (index, layer) in barLayers.enumerated() {
+            if index < KBarPeakHeight.count {
+                startOscillatingBarLayer(layer, basePeriod: basePeriod, peakHeight: KBarPeakHeight[index])
+            } else {
+                startOscillatingBarLayer(layer, basePeriod: basePeriod)
+            }
         }
     }
     
@@ -162,7 +168,10 @@ class ESTMusicIndicatorContentView: UIView {
     private func startOscillatingBarLayer(_ layer: CALayer, basePeriod: CFTimeInterval) {
         // arc4random_uniform() will return a uniformly distributed random number **less** upper_bound.
         let peakHeight: CGFloat = kBarMinPeakHeight + CGFloat(arc4random_uniform(UInt32(kBarMaxPeakHeight - kBarMinPeakHeight + 1)))
-        
+        self.startOscillatingBarLayer(layer, basePeriod: basePeriod, peakHeight: peakHeight);
+    }
+    
+    private func startOscillatingBarLayer(_ layer: CALayer, basePeriod: CFTimeInterval, peakHeight: CGFloat) {
         var fromBouns = layer.bounds;
         fromBouns.size.height = kBarIdleHeight;
         
